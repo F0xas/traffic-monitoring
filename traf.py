@@ -37,6 +37,9 @@ def packet_handler(pkt):
         encryption = detect_encryption(pkt)  # Определяем шифрование
         log_entry = f"IP {src_ip} → {dst_ip} | Протокол: {protocol} | Шифрование: {encryption}"
 
+        # Запись во все файлы
+        write_to_file("all_traffic.log", log_entry)
+        
         if pkt.haslayer(TCP):
             write_to_file("tcp.log", log_entry)
             if "TLS" in encryption or "SSL" in encryption:
@@ -50,8 +53,10 @@ def packet_handler(pkt):
     elif pkt.haslayer(ARP):  # Если это ARP-запрос
         log_entry = f"ARP Запрос: {pkt.summary()}"
         write_to_file("arp.log", log_entry)
+        write_to_file("all_traffic.log", log_entry)  # Логируем в общий файл
         print(log_entry)
 
 # Запуск анализа трафика в реальном времени
 print("Анализ трафика... (нажмите Ctrl+C для остановки)")
 sniff(prn=packet_handler, store=False)
+
