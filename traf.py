@@ -30,13 +30,15 @@ def detect_encryption(pkt):
 
 # Функция обработки пакетов
 def packet_handler(pkt):
+    packet_name = pkt.name  # Отримуємо назву пакету
     if pkt.haslayer(IP):  # Если пакет IP
         src_ip = pkt[IP].src
         dst_ip = pkt[IP].dst
         protocol = "TCP" if pkt.haslayer(TCP) else "UDP" if pkt.haslayer(UDP) else "Other"
         encryption = detect_encryption(pkt)  # Определяем шифрование
-        log_entry = f"IP {src_ip} → {dst_ip} | Протокол: {protocol} | Шифрование: {encryption}"
-
+        log_entry = (f"IP {src_ip} → {dst_ip} | Протокол: {protocol} | "
+                     f"Шифрование: {encryption} | Назва пакету: {packet_name}")
+        
         # Запись во все файлы
         write_to_file("all_traffic.log", log_entry)
         
@@ -51,7 +53,7 @@ def packet_handler(pkt):
         print(log_entry)  # Выводим в консоль
 
     elif pkt.haslayer(ARP):  # Если это ARP-запрос
-        log_entry = f"ARP Запрос: {pkt.summary()}"
+        log_entry = f"ARP Запрос: {pkt.summary()} | Назва пакету: {packet_name}"
         write_to_file("arp.log", log_entry)
         write_to_file("all_traffic.log", log_entry)  # Логируем в общий файл
         print(log_entry)
